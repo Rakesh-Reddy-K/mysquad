@@ -34,4 +34,4 @@ services:
     plan: free
     envVars:
       - key: VITE_API_URL
-        value: https://mysquad-backend-s0aq.onrender.com
+        value: https://mysquad-backend-s0aq.onrender.com/api
