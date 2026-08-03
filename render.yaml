@@ -2,7 +2,7 @@ services:
   - type: web
     name: mysquad-backend
     runtime: docker
-    repo: https://github.com/YOUR_USERNAME/YOUR_REPO
+    repo: https://github.com/Rakesh-Reddy-K/mysquad
     dockerfilePath: ./backend/Dockerfile
     plan: free
     healthCheckPath: /actuator/health
