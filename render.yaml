@@ -35,5 +35,3 @@ services:
     envVars:
       - key: VITE_API_URL
         value: /api
-      - key: BACKEND_URL
-        value: https://mysquad-backend-s0aq.onrender.com
