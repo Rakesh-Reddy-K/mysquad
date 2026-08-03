@@ -3,7 +3,8 @@ services:
     name: mysquad-backend
     runtime: docker
     repo: https://github.com/Rakesh-Reddy-K/mysquad
-    dockerfilePath: ./backend/Dockerfile
+    rootDir: backend
+    dockerfilePath: Dockerfile
     plan: free
     healthCheckPath: /actuator/health
     envVars:
@@ -28,7 +29,8 @@ services:
     name: mysquad-frontend
     runtime: docker
     repo: https://github.com/Rakesh-Reddy-K/mysquad
-    dockerfilePath: ./frontend/Dockerfile
+    rootDir: frontend
+    dockerfilePath: Dockerfile
     plan: free
     envVars:
       - key: VITE_API_URL
