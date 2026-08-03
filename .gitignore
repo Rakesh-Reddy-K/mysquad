@@ -1,0 +1,45 @@
+# =============================================================================
+# MySquad - Git Ignore Rules
+# =============================================================================
+
+# --- Environment / Secrets ---
+.env
+.env.local
+.env.*.local
+
+# --- IDE ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# --- Node / Frontend ---
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# --- Java / Backend ---
+backend/target/
+backend/out/
+*.class
+*.jar
+*.war
+*.log
+
+# --- Docker ---
+# volumes are ephemeral, no need to track
+
+# --- Test / CI artifacts ---
+e2e-test.ps1
+test-login.json
+build_log.txt
+
+# --- Misc ---
+*.pid
+*.seed
