@@ -3,8 +3,8 @@ spring:
     name: mysquad-backend
 
   datasource:
-    url: jdbc:postgresql://${DB_HOST:db.vzumejeuvggbyqleasjs.supabase.co}:${DB_PORT:5432}/${DB_NAME:postgres}?sslmode=require
-    username: ${DB_USER:postgres}
+    url: jdbc:postgresql://${DB_HOST:aws-0-ap-southeast-1.pooler.supabase.com}:${DB_PORT:6543}/${DB_NAME:postgres}?sslmode=require&prepareThreshold=0
+    username: ${DB_USER:postgres.vzumejeuvggbyqleasjs}
     password: ${DB_PASSWORD}
     hikari:
       maximum-pool-size: 10
