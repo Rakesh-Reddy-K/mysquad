@@ -25,10 +25,10 @@ public class Venue {
     @Column(nullable = false, length = 255)
     private String location;
 
-    @Column(name = "maps_url")
+    @Column(name = "maps_url", length = 500)
     private String mapsUrl;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", length = 500)
     private String imageUrl;
 
     @Column(name = "pitch_type", length = 50)

@@ -177,9 +177,20 @@ function EditPlayerDialog({ player, onClose }: { player: Player; onClose: () => 
   const [battingStyle, setBattingStyle] = useState<string>(player.battingStyle || '');
   const [bowlingStyle, setBowlingStyle] = useState<string>(player.bowlingStyle || '');
   const [phone, setPhone] = useState(player.phone || '');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const errs: Record<string, string> = {};
+    if (!name.trim()) errs.name = 'Player name is required';
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (!phone.trim()) {
+      errs.phone = 'Mobile number is required';
+    } else if (!/^[6-9]\d{9}$/.test(phoneDigits)) {
+      errs.phone = 'Enter a valid 10-digit mobile number';
+    }
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) return;
     updateMutation.mutate(
       {
         id: String(player.id),
@@ -207,6 +218,7 @@ function EditPlayerDialog({ player, onClose }: { player: Player; onClose: () => 
           <div>
             <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Name</label>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="input-base" />
+            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -219,8 +231,9 @@ function EditPlayerDialog({ player, onClose }: { player: Player; onClose: () => 
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Phone</label>
+              <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Mobile Number *</label>
               <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} className="input-base" />
+              {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">

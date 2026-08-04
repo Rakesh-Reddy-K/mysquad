@@ -25,7 +25,6 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginForm>({
-    defaultValues: { phone: '9876543210', password: 'demo1234' },
   });
 
   const onSubmit = (data: LoginForm) => {

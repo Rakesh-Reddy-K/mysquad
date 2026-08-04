@@ -13,6 +13,25 @@ import type { Match } from '@/types';
 import * as api from '@/lib/api';
 
 /* ------------------------------------------------------------------ */
+/* Validation helpers                                                  */
+/* ------------------------------------------------------------------ */
+
+const isValidUrl = (value: string) => {
+  if (!value.trim()) return true; // optional field
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+function ErrorText({ message }: { message?: string }) {
+  if (!message) return null;
+  return <p className="text-xs text-red-500 mt-1">{message}</p>;
+}
+
+/* ------------------------------------------------------------------ */
 /* Schedule Match (captain)                                            */
 /* ------------------------------------------------------------------ */
 
@@ -280,10 +299,30 @@ export function AddPlayerDialog({ open, onClose }: AddPlayerDialogProps) {
   const [bowlingStyle, setBowlingStyle] = useState('MEDIUM');
   const [jerseyNumber, setJerseyNumber] = useState('');
   const [defaultPassword, setDefaultPassword] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const createPlayer = useCreatePlayerMutation();
 
+  const validate = () => {
+    const errs: Record<string, string> = {};
+    if (!name.trim()) errs.name = 'Player name is required';
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (!phone.trim()) {
+      errs.phone = 'Mobile number is required';
+    } else if (!/^[6-9]\d{9}$/.test(phoneDigits)) {
+      errs.phone = 'Enter a valid 10-digit mobile number';
+    }
+    if (jerseyNumber) {
+      const num = Number(jerseyNumber);
+      if (!Number.isInteger(num) || num <= 0) {
+        errs.jerseyNumber = 'Jersey number must be a positive whole number';
+      }
+    }
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
   const handleSubmit = () => {
-    if (!name.trim()) return;
+    if (!validate()) return;
     createPlayer.mutate(
       {
         name: name.trim(),
@@ -366,11 +405,12 @@ export function AddPlayerDialog({ open, onClose }: AddPlayerDialogProps) {
             className="input-base w-full"
             autoFocus
           />
+          <ErrorText message={errors.name} />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="label-base">Phone</label>
+            <label className="label-base">Mobile Number *</label>
             <input
               type="tel"
               value={phone}
@@ -378,6 +418,7 @@ export function AddPlayerDialog({ open, onClose }: AddPlayerDialogProps) {
               placeholder="98765 43210"
               className="input-base w-full"
             />
+            <ErrorText message={errors.phone} />
           </div>
           <div>
             <label className="label-base">Jersey #</label>
@@ -388,6 +429,7 @@ export function AddPlayerDialog({ open, onClose }: AddPlayerDialogProps) {
               placeholder="7"
               className="input-base w-full"
             />
+            <ErrorText message={errors.jerseyNumber} />
           </div>
         </div>
 
@@ -438,7 +480,6 @@ export function AddPlayerDialog({ open, onClose }: AddPlayerDialogProps) {
             fullWidth
             onClick={handleSubmit}
             loading={createPlayer.isPending}
-            disabled={!name.trim()}
           >
             <UserPlus className="w-4 h-4" /> Add Player
           </Button>
@@ -459,15 +500,26 @@ interface AddVenueDialogProps {
 
 export function AddVenueDialog({ open, onClose }: AddVenueDialogProps) {
   const [name, setName] = useState('');
-  const [location, setLocation] = useState('');
+  const [location, setLocation] = useState('Hyderabad');
   const [pitchType, setPitchType] = useState('Grass');
   const [parking, setParking] = useState(true);
   const [mapsUrl, setMapsUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const createVenue = useCreateVenueMutation();
 
+  const validate = () => {
+    const errs: Record<string, string> = {};
+    if (!name.trim()) errs.name = 'Ground name is required';
+    if (!location.trim()) errs.location = 'Location is required';
+    if (mapsUrl.trim() && !isValidUrl(mapsUrl)) errs.mapsUrl = 'Enter a valid URL';
+    if (imageUrl.trim() && !isValidUrl(imageUrl)) errs.imageUrl = 'Enter a valid URL';
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
   const handleSubmit = () => {
-    if (!name.trim() || !location.trim()) return;
+    if (!validate()) return;
     createVenue.mutate(
       {
         name: name.trim(),
@@ -482,11 +534,12 @@ export function AddVenueDialog({ open, onClose }: AddVenueDialogProps) {
       {
         onSuccess: () => {
           setName('');
-          setLocation('');
+          setLocation('Hyderabad');
           setPitchType('Grass');
           setParking(true);
           setMapsUrl('');
           setImageUrl('');
+          setErrors({});
           onClose();
         },
       },
@@ -506,6 +559,7 @@ export function AddVenueDialog({ open, onClose }: AddVenueDialogProps) {
             className="input-base w-full"
             autoFocus
           />
+          <ErrorText message={errors.name} />
         </div>
 
         <div>
@@ -517,6 +571,7 @@ export function AddVenueDialog({ open, onClose }: AddVenueDialogProps) {
             placeholder="e.g. Hyderabad, Telangana"
             className="input-base w-full"
           />
+          <ErrorText message={errors.location} />
         </div>
 
         <div>
@@ -552,6 +607,7 @@ export function AddVenueDialog({ open, onClose }: AddVenueDialogProps) {
             placeholder="https://maps.app.goo.gl/..."
             className="input-base w-full"
           />
+          <ErrorText message={errors.mapsUrl} />
         </div>
 
         <div>
@@ -563,6 +619,7 @@ export function AddVenueDialog({ open, onClose }: AddVenueDialogProps) {
             placeholder="Leave blank for default ground photo"
             className="input-base w-full"
           />
+          <ErrorText message={errors.imageUrl} />
         </div>
 
         <div className="flex gap-3 pt-2">
@@ -574,7 +631,6 @@ export function AddVenueDialog({ open, onClose }: AddVenueDialogProps) {
             fullWidth
             onClick={handleSubmit}
             loading={createVenue.isPending}
-            disabled={!name.trim() || !location.trim()}
           >
             <MapPinPlus className="w-4 h-4" /> Add Venue
           </Button>

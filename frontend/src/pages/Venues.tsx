@@ -159,9 +159,21 @@ function EditVenueDialog({ venue, onClose }: { venue: Venue; onClose: () => void
   const [imageUrl, setImageUrl] = useState(venue.imageUrl || '');
   const [pitchType, setPitchType] = useState(venue.pitchType || '');
   const [parking, setParking] = useState(venue.parking);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const errs: Record<string, string> = {};
+    if (!name.trim()) errs.name = 'Ground name is required';
+    if (!location.trim()) errs.location = 'Location is required';
+    if (mapsUrl.trim()) {
+      try { new URL(mapsUrl); } catch { errs.mapsUrl = 'Enter a valid URL'; }
+    }
+    if (imageUrl.trim()) {
+      try { new URL(imageUrl); } catch { errs.imageUrl = 'Enter a valid URL'; }
+    }
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) return;
     updateMutation.mutate(
       {
         id: String(venue.id),
@@ -190,10 +202,12 @@ function EditVenueDialog({ venue, onClose }: { venue: Venue; onClose: () => void
           <div>
             <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Name</label>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="input-base" />
+            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Location</label>
             <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} required className="input-base" />
+            {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Pitch Type</label>
@@ -202,10 +216,12 @@ function EditVenueDialog({ venue, onClose }: { venue: Venue; onClose: () => void
           <div>
             <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Google Maps URL</label>
             <input type="text" value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} className="input-base" />
+            {errors.mapsUrl && <p className="text-xs text-red-500 mt-1">{errors.mapsUrl}</p>}
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Image URL</label>
             <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="input-base" />
+            {errors.imageUrl && <p className="text-xs text-red-500 mt-1">{errors.imageUrl}</p>}
           </div>
           <div className="flex items-center gap-2">
             <input

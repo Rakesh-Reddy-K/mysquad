@@ -9,6 +9,7 @@ import com.mysquad.repository.UserRepository;
 import com.mysquad.service.ApiMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -125,6 +126,8 @@ public class PlayerController {
 
     public record CreatePlayerRequest(
             @NotBlank String name,
+            @NotBlank(message = "Mobile number is required")
+            @Pattern(regexp = "^[6-9][0-9]{9}$", message = "Valid 10-digit mobile number required")
             String phone,
             String role,
             String battingStyle,
@@ -134,6 +137,7 @@ public class PlayerController {
 
     public record UpdatePlayerRequest(
             String name,
+            @Pattern(regexp = "^[6-9][0-9]{9}$", message = "Valid 10-digit mobile number required")
             String phone,
             String role,
             String battingStyle,

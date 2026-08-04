@@ -42,6 +42,7 @@ export default function MatchDetails() {
   const [result, setResult] = useState('WON');
   const [score, setScore] = useState('');
   const [mom, setMom] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const updateResultMutation = useUpdateMatchResultMutation();
   const deleteMatchMutation = useDeleteMatchMutation();
 
@@ -63,6 +64,15 @@ export default function MatchDetails() {
 
   const handleUpdateResult = () => {
     if (!id) return;
+    const errs: Record<string, string> = {};
+    if (score.trim()) {
+      const scorePattern = /^\d{1,3}\/\d{1,2}(\s+vs\s+\d{1,3}\/\d{1,2})?$/i;
+      if (!scorePattern.test(score.trim())) {
+        errs.score = 'Use format like 168/6 or 168/6 vs 162/8';
+      }
+    }
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) return;
     updateResultMutation.mutate(
       {
         id,
@@ -78,6 +88,7 @@ export default function MatchDetails() {
           setResult('WON');
           setScore('');
           setMom('');
+          setErrors({});
         },
       },
     );
@@ -350,7 +361,7 @@ export default function MatchDetails() {
       )}
 
       {/* Update Result Dialog */}
-      <Dialog open={resultOpen} onClose={() => setResultOpen(false)} title="Update Match Result">
+      <Dialog open={resultOpen} onClose={() => { setResultOpen(false); setErrors({}); }} title="Update Match Result">
         <div className="space-y-4">
           <div>
             <label className="label-base">Result *</label>
@@ -370,6 +381,7 @@ export default function MatchDetails() {
               placeholder="168/6"
               className="input-base w-full"
             />
+            {errors.score && <p className="text-xs text-red-500 mt-1">{errors.score}</p>}
           </div>
           <div>
             <label className="label-base">Man of the Match</label>
@@ -382,7 +394,7 @@ export default function MatchDetails() {
             />
           </div>
           <div className="flex gap-3 pt-2">
-            <Button variant="outline" fullWidth onClick={() => setResultOpen(false)}>
+            <Button variant="outline" fullWidth onClick={() => { setResultOpen(false); setErrors({}); }}>
               Cancel
             </Button>
             <Button
